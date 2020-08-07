@@ -12,37 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef RCUTILS__EVENT_TYPES_H_
+#define RCUTILS__EVENT_TYPES_H_
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-//#include "rcutils/macros.h"
-#include <stdio.h>
-#include "rcutils/visibility_control.h"
-#include "rcutils/env.h"
+enum EventType {
+    SUBSCRIPTION_EVENT,
+    SERVICE_EVENT,
+    CLIENT_EVENT
+};
 
-#include "rcutils/event_queue.h"
+typedef enum EventType EventType;
 
+struct EventQ {
+  void * entity;
+  EventType type;
+};
 
-static Event event_;
+typedef struct EventQ EventQ;
 
-Event
-rcutils_get_next_event(void)
-{
-    printf( "Get: Address of entity: %p\n", ( void * )event_.entity );
-    return event_;
-}
+typedef void (*Event_callback)(void * context, EventQ event);
 
-void
-rcutils_set_next_event(Event event)
-{
-    event_ = event;
+struct EventHook {
 
-    printf( "Set: Address of entity: %p\n", ( void * )event_.entity );
-}
+    // Associated context (executor)
+    void * context;
+
+    // Event handle;
+    void * ros2_handle;
+
+    // Event callback
+    Event_callback callback;
+};
+
+typedef struct EventHook EventHook;
+
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif  // RCUTILS__EVENT_TYPES_H_

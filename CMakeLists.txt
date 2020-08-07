@@ -45,7 +45,6 @@ set(rcutils_sources
   src/cmdline_parser.c
   src/env.c
   src/error_handling.c
-  src/event_queue.c
   src/filesystem.c
   src/find.c
   src/format_string.c
