@@ -23,7 +23,8 @@ extern "C"
 enum EventType {
     SUBSCRIPTION_EVENT,
     SERVICE_EVENT,
-    CLIENT_EVENT
+    CLIENT_EVENT,
+    GUARD_CONDITION_EVENT
 };
 
 typedef enum EventType EventType;
