@@ -30,13 +30,13 @@ enum ExecutorEventType {
 typedef enum ExecutorEventType ExecutorEventType;
 
 struct ExecutorEvent {
-  const void * entity;
+  const void * entity_handle;
   ExecutorEventType type;
 };
 
 typedef struct ExecutorEvent ExecutorEvent;
 
-typedef void (*EventsExecutorCallback)(const void * context, ExecutorEvent event);
+typedef void (*EventsExecutorCallback)(const void * executor_ptr, ExecutorEvent event);
 
 
 #ifdef __cplusplus
