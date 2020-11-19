@@ -243,6 +243,7 @@ TEST_F(ArrayListPreInitTest, remove_success_removes_from_list) {
   EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
 
   ret = rcutils_array_list_get_size(&list, &size);
+  ASSERT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
   EXPECT_EQ(size, (size_t)0);
 }
 
@@ -333,6 +334,7 @@ TEST_F(ArrayListTest, add_grow_capacity) {
   for (uint32_t i = 0; i < 17; ++i) {
     uint32_t ret_data = 0;
     ret = rcutils_array_list_get(&list, i, &ret_data);
+    ASSERT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
     EXPECT_EQ((i * 2), ret_data) << rcutils_get_error_string().str;
   }
 
@@ -372,6 +374,39 @@ TEST_F(ArrayListPreInitTest, remove_preserves_data_around_it) {
   ret = rcutils_array_list_get(&list, 2, &ret_data);
   EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
   EXPECT_EQ((uint32_t)6, ret_data) << rcutils_get_error_string().str;
+
+  ret = rcutils_array_list_remove(&list, 2);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+
+  ret = rcutils_array_list_get_size(&list, &size);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+  EXPECT_EQ(size, (size_t)2);
+
+  ret = rcutils_array_list_get(&list, 0, &ret_data);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+  EXPECT_EQ((uint32_t)0, ret_data) << rcutils_get_error_string().str;
+
+  ret = rcutils_array_list_get(&list, 1, &ret_data);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+  EXPECT_EQ((uint32_t)2, ret_data) << rcutils_get_error_string().str;
+
+  ret = rcutils_array_list_remove(&list, 0);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+
+  ret = rcutils_array_list_get_size(&list, &size);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+  EXPECT_EQ(size, (size_t)1);
+
+  ret = rcutils_array_list_get(&list, 0, &ret_data);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+  EXPECT_EQ((uint32_t)2, ret_data) << rcutils_get_error_string().str;
+
+  ret = rcutils_array_list_remove(&list, 0);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+
+  ret = rcutils_array_list_get_size(&list, &size);
+  EXPECT_EQ(RCUTILS_RET_OK, ret) << rcutils_get_error_string().str;
+  EXPECT_EQ(size, (size_t)0);
 }
 
 TEST_F(ArrayListPreInitTest, init_list_twice_fails) {

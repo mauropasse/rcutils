@@ -27,13 +27,26 @@ extern "C"
 #include <dirent.h>
 #include <unistd.h>
 #else
+// When building with MSVC 19.28.29333.0 on Windows 10 (as of 2020-11-11),
+// there appears to be a problem with winbase.h (which is included by
+// Windows.h).  In particular, warnings of the form:
+//
+// warning C5105: macro expansion producing 'defined' has undefined behavior
+//
+// See https://developercommunity.visualstudio.com/content/problem/695656/wdk-and-sdk-are-not-compatible-with-experimentalpr.html
+// for more information.  For now disable that warning when including windows.h
+#pragma warning(push)
+#pragma warning(disable : 5105)
 #include <windows.h>
+#pragma warning(pop)
 #include <direct.h>
 #endif  // _WIN32
 
 #include "rcutils/error_handling.h"
 #include "rcutils/format_string.h"
+#include "rcutils/get_env.h"
 #include "rcutils/repl_str.h"
+#include "rcutils/strdup.h"
 
 #ifdef _WIN32
 # define RCUTILS_PATH_DELIMITER "\\"
@@ -179,6 +192,29 @@ rcutils_to_native_path(
   }
 
   return rcutils_repl_str(path, "/", RCUTILS_PATH_DELIMITER, &allocator);
+}
+
+char *
+rcutils_expand_user(const char * path, rcutils_allocator_t allocator)
+{
+  if (NULL == path) {
+    return NULL;
+  }
+
+  if ('~' != path[0]) {
+    return rcutils_strdup(path, allocator);
+  }
+
+  const char * homedir = rcutils_get_home_dir();
+  if (NULL == homedir) {
+    return NULL;
+  }
+  return rcutils_format_string_limit(
+    allocator,
+    strlen(homedir) + strlen(path),
+    "%s%s",
+    homedir,
+    path + 1);
 }
 
 bool
